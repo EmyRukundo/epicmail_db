@@ -59,7 +59,7 @@ const getMessages = async (req, res) => res.json({
 //@get a specific Email
    const specificEmail = (req, res) => {
     const sql = `SELECT * FROM message_table WHERE id = '${req.params.id}'`;
-    const messageSql = Connection.executeQuery(sql);
+    const messageSql = Database.executeQuery(sql);
     messageSql.then((result) => {
       if (result.rows.length) {
         return res.status(200).json({
@@ -83,7 +83,7 @@ const getMessages = async (req, res) => res.json({
     
     const sentMessage = (req, res) => {
         const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
-        const messageSql = Connection.executeQuery(sql);
+        const messageSql = Database.executeQuery(sql);
         messageSql.then((result) => {
           if (result.rows.length) {
             return res.status(200).json({
@@ -107,7 +107,7 @@ const getMessages = async (req, res) => res.json({
 
 const unreadMessage = (req, res) => {
     const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
-    const messageSql = Connection.executeQuery(sql);
+    const messageSql = Database.executeQuery(sql);
     messageSql.then((result) => {
       if (result.rows.length) {
         return res.status(200).json({
@@ -132,7 +132,7 @@ const unreadMessage = (req, res) => {
 const deleteEmail = (req, res) => {
 
     const id = req.params.id;
-    Connection.query("SELECT * FROM message_table WHERE id=$1", [id],
+    Database.query("SELECT * FROM message_table WHERE id=$1", [id],
       (error, result) => {
         if (error) {
         //console.log(error);
@@ -157,5 +157,5 @@ const deleteEmail = (req, res) => {
 
 
     export{
-        getMessages,createMessage,specificEmail,sentMessage,unreadMessage,deleteMessage
+        getMessages,createMessage,specificEmail,sentMessage,unreadMessage,deleteEmail
       };
