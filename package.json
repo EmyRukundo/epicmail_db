@@ -4,6 +4,7 @@
   "description": "database intergration ",
   "main": "app.js",
   "scripts": {
+    "migrate": "node --require babel-register server/db/db-connection.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --require babel-core/register --require babel-polyfill  app.js",
     "dev": "nodemon --require babel-core/register --require babel-polyfill app.js"
