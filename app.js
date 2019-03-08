@@ -1,9 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import userRouter from './server/routes/users';
-// import messageRouter from './server/routes/message';
-// import specificRouter from './server/routes/specificEmail';
-// import deleteRouter from './server/routes/deleteMessage';
+import messageRouter from './server/routes/message';
+import specificRouter from './server/routes/specificEmail';
+import deleteRouter from './server/routes/deleteMessage';
 
 const app = express();
 
@@ -11,11 +11,11 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use('/api/v1/',specificRouter);
+app.use('/api/v1/',specificRouter);
 app.use('/api/v1/auth/',userRouter);
-// app.use('/api/v1/',messageRouter);
+app.use('/api/v1/',messageRouter);
 
-// app.use('/api/v1/',deleteRouter);
+app.use('/api/v1/',deleteRouter);
 
 app.get('/',(req,res)=>{
 

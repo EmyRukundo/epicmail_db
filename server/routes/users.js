@@ -1,5 +1,4 @@
 import express from 'express';
-// import {getUsers,login,signUp} from '../controllers/users';
 import getUsers from '../controllers/allUsers';
 import login from '../controllers/login';
 import signUp from '../controllers/signup';
