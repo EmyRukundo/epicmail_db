@@ -128,7 +128,7 @@ const deleteGroup = (req, res) => {
 
   // @DELETE A MEMBER OF A GROUP
 
-const deleteGroup = (req, res) => {
+const deleteMember = (req, res) => {
 
     const id = req.params.id;
     Database.query("SELECT * FROM groupMember_table WHERE id=$1", [id],
@@ -203,108 +203,6 @@ const deleteGroup = (req, res) => {
 
 
 
-
-
-//@get a specific Email
-   const specificEmail = (req, res) => {
-    const sql = `SELECT * FROM message_table WHERE id = '${req.params.id}'`;
-    const messageSql = Database.executeQuery(sql);
-    messageSql.then((result) => {
-      if (result.rows.length) {
-        return res.status(200).json({
-          status: 200,
-          data: result.rows,
-        });
-      }
-  
-      return res.status(404).json({
-        status: 404,
-        error: 'No email found on this id',
-      });
-    }).catch(error => res.status(500).json({
-      status: 500,
-      error: `Internal server error ${error}`,
-    }));
-  };
-
-  
-  //@get a sent message
-    
-    const sentMessage = (req, res) => {
-        const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
-        const messageSql = Database.executeQuery(sql);
-        messageSql.then((result) => {
-          if (result.rows.length) {
-            return res.status(200).json({
-              status: 200,
-              data: result.rows,
-            });
-          }
-      
-          return res.status(404).json({
-            status: 404,
-            error: 'No sent email found',
-          });
-        }).catch(error => res.status(500).json({
-          status: 500,
-          error: `Internal server error ${error}`,
-        }));
-      };
-
-
-// @get unread Message
-
-const unreadMessage = (req, res) => {
-    const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
-    const messageSql = Database.executeQuery(sql);
-    messageSql.then((result) => {
-      if (result.rows.length) {
-        return res.status(200).json({
-          status: 200,
-          data: result.rows,
-        });
-      }
-  
-      return res.status(404).json({
-        status: 404,
-        error: 'No unread email found',
-      });
-    }).catch(error => res.status(500).json({
-      status: 500,
-      error: `Internal server error ${error}`,
-    }));
-  };
-
-
- //@deleteEmail
-
-const deleteEmail = (req, res) => {
-
-    const id = req.params.id;
-    Database.query("SELECT * FROM message_table WHERE id=$1", [id],
-      (error, result) => {
-        if (error) {
-        //console.log(error);
-          return res.status(500).json(error);
-        }
-        if (result.rows.length === 0) {
-          return res.status(400).json({ error: "Sorry! no message found on this id." });
-        }
-        //@delete if it is available
-        pool.query("DELETE FROM meetup_table WHERE id=$1", [id],
-          (er, messageSql) => {
-            if (er) {
-              return res.status(500).json(er);
-            }
-            if (!messageSql) {
-              return res.status(500).json({ error: "something went wrong try again later" });
-            }
-            return res.status(200).json({ success: true, message: "you deleted a message successfully." });
-          });
-      });
-  };
-
-
     export{
-        getGroups,createGroup,specificEmail,sentMessage,unreadMessage,deleteEmail
+        getGroups,createGroup,updateGroup,deleteGroup,groupMember,deleteMember,EmailGroup
       };
