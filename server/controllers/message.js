@@ -1,5 +1,5 @@
 import Database from '../db/db-connection';
-import Validation from '../helpers/validation';
+import Validation from '../helpers/validations';
 import messages from'../models/message.js';
 import joi from 'joi';
 

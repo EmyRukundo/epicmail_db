@@ -1,6 +1,6 @@
 import Database from '../db/db-connection';
-import Validation from '../helpers/validation';
-import groups from'../models/message.js';
+import Validation from '../helpers/validations';
+import groups from'../models/groups.js';
 import joi from 'joi';
 
 
@@ -21,7 +21,7 @@ const getGroups = async (req, res) => res.json({
         });
       }
       const newGroup = [
-        id,
+        result.id,
         result.name,
         result.role  
        
@@ -49,15 +49,58 @@ const getGroups = async (req, res) => res.json({
     });
   };
 
-//UPDATE GROUP
-const updateGroup = (req,res) => {
-    const sql =` SELECT * FROM group_table WHERE id ='${req.params.id}' `;
-    const groupSql = Database.executeQuery(sql);
-    groupSql.then(() => {
-        const sql =` INSERT * FROM group_table WHERE id ='${req.params.id}' `;
-        
+  
+//@UPDATE GROUP Name
+
+  const updateGroup = (req, res) => {
+    const checkGroupSql = `SELECT * FROM group_table WHERE id  = '${req.params.id}'`;
+    const isAvailable = Database.executeQuery(checkGroupSql);
+    isAvailable.then((isValid) => {
+      if (isValid.rows) {
+        if (isValid.rows.length) {
+          joi.validate(req.body, Validation.groupSchema, Validation.validationOption)
+            .then((result) => {
+              let token = 0;
+              let decodedToken = '';
+              let userId = '';
+              if (req.headers.authorization) {
+              // eslint-disable-next-line prefer-destructuring
+                token = req.headers.authorization.split(' ')[1];
+                decodedToken = jsonWebToken.verify(token, process.env.SECRETKEY);
+                userId = decodedToken.user[0].id;
+              } else {
+                return res.sendStatus(403);
+              }
+
+              const sql = `UPDATE group_table SET name = '${name}' WHERE group_id = '${req.params.id}' RETURNING *`
+
+              const editName = Database.executeQuery(sql);
+              editName.then((updatenameResult) => {
+                if (updatenameResult.rows) {
+                  if (updatenameResult.rows.length) {
+                    return res.status(201).json({
+                      status: 201,
+                      data: updatenameResult.rows,
+                    });
+                  }
+                }
+  
+                return res.status(400).json({
+                  status: 400,
+                  error: 'Cannot update a group name',
+                });
+              }).catch(error => res.status(500).json({
+                status: 500,
+                error: `Internal server error ${error}`,
+              }));
+            }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
+        }
+      }
     })
-}
+  };
+
+
+
 // @DELETE GROUP
 
 const deleteGroup = (req, res) => {
@@ -87,43 +130,67 @@ const deleteGroup = (req, res) => {
   };
 
 
-  //@Add a User to the group
-  const groupMember = (req, res) => {
-    joi.validate(req.body, Validation.groupMemberSchema, Validation.validationOption, async (err, result) => {
-      if (err) {
-        return res.json({
-          status: 400,
-          error: err.details[0].message,
-        });
-      }
-      const newMember = [
-        result.id,
-        result.userId,
-        result.userRole  
-       
-      ];
-      const sql = 'INSERT INTO groupMember_table (id, name,role) VALUES ($1,$2,$3) RETURNING *';
-      const groupSql =Database.executeQuery(sql, newMember);
-      groupSql.then((insertedMember) => {
-        if (insertedMember.rows.length) {
-          return res.status(200).json({
-            status: 200,
-            data: insertedMember.rows,
-          });
-        }
+ //@Add a User to the group
+
+ const groupMember = (req, res) => {
+    const checkgroupSql = `SELECT * FROM group_table WHERE id  = '${req.params.id}'`;
+    const isAvailable = Database.executeQuery(checkgroupSql);
+    isAvailable.then((isValid) => {
+      if (isValid.rows) {
+        if (isValid.rows.length) {
+          joi.validate(req.body, Validation.groupSchema, Validation.validationOption)
+            .then((result) => {
+              let token = 0;
+              let decodedToken = '';
+              let userId = '';
+              if (req.headers.authorization) {
+              // eslint-disable-next-line prefer-destructuring
+                token = req.headers.authorization.split(' ')[1];
+                decodedToken = jsonWebToken.verify(token, process.env.SECRETKEY);
+                userId = decodedToken.user[0].id;
+              } else {
+                return res.sendStatus(403);
+              }
+              const newMember = [
+                ​ result.id,
+                ​ result.userId,  
+                 ​result.userRole,
+              ];
+              const sql = `INSERT INTO member_table (id,userId,userRole)
+           VALUES ($1,$2,$3) RETURNING *`;
+              const user = Database.executeQuery(sql, newMember);
+              user.then((userResult) => {
+                if (userResult.rows) {
+                  if (userResult.rows.length) {
+                    return res.status(201).json({
+                      status: 201,
+                      data: userResult.rows,
+                    });
+                  }
+                }
   
-        return res.status(400).json({
-          status: 400,
-          error: " Cant not add a User",
-        });
-      });
-    }).catch((error) => {
-      res.status(500).json({
-        status: 500,
-        error: `Internal server error ${error}`,
-      });
-    });
+                return res.status(400).json({
+                  status: 400,
+                  error: 'user could not be created',
+                });
+              }).catch(error => res.status(500).json({
+                status: 500,
+                error: `Internal server error ${error}`,
+              }));
+            }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
+        }
+      } else {
+        return res.status(400)
+          .json({ status: 400, error: 'Error : can not create user to a non existing group' });
+      }
+    }).catch(error => res.status(500).json({ status: 500, error: `Server error: ${error}` }));
   };
+  
+
+
+
+
+
 
 
   // @DELETE A MEMBER OF A GROUP
@@ -157,8 +224,7 @@ const deleteMember = (req, res) => {
 
   //@Create or send an ​email​ to a ​group 
 
-
-  const EmailGroup = (req, res) => {
+  const emailGroup = (req, res) => {
     joi.validate(req.body, Validation.messageSchema, Validation.validationOption, async (err, result) => {
       if (err) {
         return res.json({
@@ -169,7 +235,7 @@ const deleteMember = (req, res) => {
       const dayMonthYear = result.happeningOn.split('/');
       const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
       const newEmail = [
-        id,
+        result.id,
         new Date(),
         result.subject,
         result.message,
@@ -204,5 +270,5 @@ const deleteMember = (req, res) => {
 
 
     export{
-        getGroups,createGroup,updateGroup,deleteGroup,groupMember,deleteMember,EmailGroup
+        getGroups,createGroup,updateGroup,deleteGroup,groupMember,deleteMember,emailGroup
       };
