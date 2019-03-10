@@ -13,12 +13,13 @@ const Validator = {
     subject: joi.string().required(),
     message: joi.string().required(),
     parentMessageId: joi.string().required(),
-    ​status: joi.string().required(),
+    // ​status: joi.string().required(),
   }),
 
   groupSchema: joi.object().keys({
     name: joi.string().required().min(1),
   }),
+
   loginSchema: joi.object().keys({
     email: joi.string().email().required(),
     password: joi.string().required(),
