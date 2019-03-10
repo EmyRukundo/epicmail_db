@@ -5,6 +5,7 @@ import messageRouter from './server/routes/message';
 import specificRouter from './server/routes/specificEmail';
 import deleteRouter from './server/routes/deleteMessage';
 import groupsRouter from './server/routes/groups';
+import Database from './server/db/db-connection';
 
 const app = express();
 

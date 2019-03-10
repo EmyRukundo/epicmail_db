@@ -7,9 +7,9 @@ dotenv.config();
 class Database {
   constructor() {
     this.pool = new Pool({
-      user: 'postgres',
+      user: 'epic_mail',
       host: 'localhost',
-      database: 'postgres',
+      database: 'epic_mail',
       password: 'andela',
       port: 5432
     });
@@ -17,8 +17,8 @@ class Database {
     this.connect = async () => this.pool.connect();
 
     this.userTable = `
-    CREATE TABLE user_table (
-    id PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS user_table (
+    id SERIAL PRIMARY KEY,
     email VARCHAR(120) NOT NULL UNIQUE,
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
@@ -28,49 +28,51 @@ class Database {
         `;
     this.contactsTable = `
     CREATE TABLE IF NOT EXISTS contacts_table (
-        id PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         email VARCHAR(120) NOT NULL UNIQUE,
         firstname VARCHAR(30) NOT NULL,
-        lastname VARCHAR(30) NOT NULL,
+        lastname VARCHAR(30) NOT NULL
     );
     `;
     this.messagesTable = `
     CREATE TABLE IF NOT EXISTS messages_table (
-        id PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         created_on DATE NOT NULL,    
         subject VARCHAR(60) NOT NULL,
         messages VARCHAR(128) NOT NULL,
-        parentMessageId REFERENCES user_Table (id) ON DELETE CASCADE,
+        parent_message_id SERIAL REFERENCES user_Table ( id ) ON DELETE CASCADE,
         status VARCHAR(30) NOT NULL
     );
     `;
     this.sentTable = `
     CREATE TABLE IF NOT EXISTS sent_table(
-        senderId REFERENCES user_table (id) ON DELETE CASCADE,
-        messageId REFERENCES messages_table (id) ON DELETE CASCADE,
+        id SERIAL PRIMARY KEY,
+        sender_id SERIAL REFERENCES user_table(id) ON DELETE CASCADE,
+        message_id SERIAL REFERENCES messages_table (id) ON DELETE CASCADE,
         created_on DATE NOT NULL
     );
     `;
     this.inboxTable = `
     CREATE TABLE IF NOT EXISTS inbox_table (
-      receiverId REFERENCES user_table(id) ON DELETE CASCADE,
-      messageId REFERENCES messages_table (id) ON DELETE CASCADE,
+     id SERIAL PRIMARY KEY,
+      receiver_id SERIAL REFERENCES user_table (id) ON DELETE CASCADE,
+      message_id SERIAL REFERENCES messages_table (id) ON DELETE CASCADE,
       created_on DATE NOT NULL
       
     )`;
 
     this.groupTable = `
     CREATE TABLE IF NOT EXISTS group_table (
-        id PRIMARY KEY,
-        groupName VARCHAR(128) NOT NULL
+        id SERIAL PRIMARY KEY,
+        group_name VARCHAR(128) NOT NULL
     );
     `;
 
     this.groupMembersTable = `
-    CREATE TABLE IF NOT EXISTS groupMembers_table (
-          id PRIMARY KEY,
-        groupId REFERENCES group_table (id) ON DELETE CASCADE,
-        userRole VARCHAR(128) NOT NULL,
+    CREATE TABLE IF NOT EXISTS group_members_table (
+          id SERIAL PRIMARY KEY,
+        group_id SERIAL REFERENCES group_table (id) ON DELETE CASCADE,
+        user_role VARCHAR(128) NOT NULL
     );
     `;
     this.initializeDb();

@@ -19,7 +19,7 @@ const getGroups = async (req, res) => res.json({
           status: 400,
           error: err.details[0].message,
         });
-      }
+    }
       const newGroup = [
         result.id,
         result.name,
@@ -152,9 +152,9 @@ const deleteGroup = (req, res) => {
                 return res.sendStatus(403);
               }
               const newMember = [
-                ​ result.id,
-                ​ result.userId,  
-                 ​result.userRole,
+                // ​ id,
+                // result.userId,  
+                //  ​result.userRole,
               ];
               const sql = `INSERT INTO member_table (id,userId,userRole)
            VALUES ($1,$2,$3) RETURNING *`;
@@ -186,10 +186,6 @@ const deleteGroup = (req, res) => {
     }).catch(error => res.status(500).json({ status: 500, error: `Server error: ${error}` }));
   };
   
-
-
-
-
 
 
 

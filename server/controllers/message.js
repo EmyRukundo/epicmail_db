@@ -20,23 +20,23 @@ const getMessages = async (req, res) => res.json({
           error: err.details[0].message,
         });
       }
-      const dayMonthYear = result.happeningOn.split('/');
-      const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
+    //   const dayMonthYear = result.happeningOn.split('/');
+    //   const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
       const newMessage = [
-        id,
+       
         new Date(),
         result.subject,
         result.message,
-        result.senderId,
-        result.receivedId,
-        result.parentMessageId,
         result.status,
       ];
-      const sql = 'INSERT INTO meesage_table (id, created_on,subject,message,senderId,receiverId,parentMessageId,status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *';
+      const sql = 'INSERT INTO messages_table (created_on,subject,messages,status) VALUES ($1,$2,$3,$4) RETURNING *';
       const messageSql =Database.executeQuery(sql, newMessage);
       messageSql.then((insertedMessage) => {
+        //   console.log(insertedMessage);
         if (insertedMessage.rows.length) {
-          return res.status(200).json({
+          return res.status(200).json(
+              {
+           
             status: 200,
             data: insertedMessage.rows,
           });
@@ -58,7 +58,7 @@ const getMessages = async (req, res) => res.json({
 
 //@get a specific Email
    const specificEmail = (req, res) => {
-    const sql = `SELECT * FROM message_table WHERE id = '${req.params.id}'`;
+    const sql = `SELECT * FROM messages_table WHERE id = '${req.params.id}'`;
     const messageSql = Database.executeQuery(sql);
     messageSql.then((result) => {
       if (result.rows.length) {
@@ -82,7 +82,7 @@ const getMessages = async (req, res) => res.json({
   //@get a sent message
     
     const sentMessage = (req, res) => {
-        const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
+        const sql = `SELECT * FROM messages_table WHERE status = '${req.params.status}'`;
         const messageSql = Database.executeQuery(sql);
         messageSql.then((result) => {
           if (result.rows.length) {
@@ -93,7 +93,7 @@ const getMessages = async (req, res) => res.json({
           }
       
           return res.status(404).json({
-            status: 404,
+            status: 400,
             error: 'No sent email found',
           });
         }).catch(error => res.status(500).json({
@@ -106,7 +106,7 @@ const getMessages = async (req, res) => res.json({
 // @get unread Message
 
 const unreadMessage = (req, res) => {
-    const sql = `SELECT * FROM message_table WHERE status = '${req.params.status}'`;
+    const sql = `SELECT * FROM messages_table WHERE status = '${req.params.status}'`;
     const messageSql = Database.executeQuery(sql);
     messageSql.then((result) => {
       if (result.rows.length) {
@@ -117,7 +117,7 @@ const unreadMessage = (req, res) => {
       }
   
       return res.status(404).json({
-        status: 404,
+        status: 400,
         error: 'No unread email found',
       });
     }).catch(error => res.status(500).json({
@@ -132,7 +132,7 @@ const unreadMessage = (req, res) => {
 const deleteEmail = (req, res) => {
 
     const id = req.params.id;
-    Database.query("SELECT * FROM message_table WHERE id=$1", [id],
+    Database.query("SELECT * FROM messages_table WHERE id=$1", [id],
       (error, result) => {
         if (error) {
         //console.log(error);
@@ -142,7 +142,7 @@ const deleteEmail = (req, res) => {
           return res.status(400).json({ error: "Sorry! no message found on this id." });
         }
         //@delete if it is available
-        pool.query("DELETE FROM meetup_table WHERE id=$1", [id],
+        pool.query("DELETE FROM messages_table WHERE id=$1", [id],
           (er, messageSql) => {
             if (er) {
               return res.status(500).json(er);
@@ -154,7 +154,6 @@ const deleteEmail = (req, res) => {
           });
       });
   };
-
 
     export{
         getMessages,createMessage,specificEmail,sentMessage,unreadMessage,deleteEmail

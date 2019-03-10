@@ -1,7 +1,7 @@
 import joi from 'joi';
 import jsonWebToken from 'jsonwebtoken';
-import Connection from '../db/db-connection';
-// import Validation from '../helpers/validation';
+import Database from '../db/db-connection';
+import Validation from '../helpers/validations';
 import Helper from '../helpers/helpers';
 
 const unknownUser = (req, res) => {
@@ -18,7 +18,7 @@ const unknownUser = (req, res) => {
         password: result.password,
       };
       const sql = `SELECT * FROM user_table WHERE email = '${userAccount.email}'`;
-      const user = Connection.executeQuery(sql);
+      const user = Database.executeQuery(sql);
       user.then((userResult) => {
         if (userResult.rows.length) {
           if (Helper.comparePassword(userAccount.password, userResult.rows[0].password)) {
