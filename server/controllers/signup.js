@@ -11,11 +11,11 @@ const registerUser = (req, res) => {
       result.firstname,
       result.lastname,    
       Helper.hashPassword(result.password, 12),
-      'ABX#4454$', // token
+    
      
     ];
-    const sql = `INSERT INTO user_table (email, firstname, lastname, password, token)
-     VALUES ($1,$2,$3,$4,$5) RETURNING *`;
+    const sql = `INSERT INTO user_table (email, firstname, lastname, password)
+     VALUES ($1,$2,$3,$4) RETURNING *`;
 
     const user = Database.executeQuery(sql, newUser);
     user.then((userResult) => {

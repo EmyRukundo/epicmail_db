@@ -1,18 +1,11 @@
-import users from '../models/users';
-import Database from '../db/db-connection';
-
+import selectFrom  from '../models/users';
 
 const getUsers = async (req, res) => {
-  if (users) {
-    return res.json({
-      status: 200,
-      data:users.rows,
-    });
-  }
-
-  return res.json({
-    status: 404,
-    error: 'No users found',
-  });
+  selectFrom('user_table').then((users) => {
+    if (users.rows) {
+      return res.status(200).json({ status: 200, data: users.rows });
+    }
+  }).catch(error => res.status(500).json({ status: 500, error: `Internal server error : ${error}` }));
 };
+
 export default getUsers;

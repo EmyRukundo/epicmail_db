@@ -23,22 +23,26 @@ const getMessages = async (req, res) => res.json({
     //   const dayMonthYear = result.happeningOn.split('/');
     //   const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
       const newMessage = [
-       
         new Date(),
         result.subject,
         result.message,
+        req.params.id, //senderId
+        req.params.id, //receiverid
+        result.parentmessageid,
         result.status,
+
       ];
-      const sql = 'INSERT INTO messages_table (created_on,subject,messages,status) VALUES ($1,$2,$3,$4) RETURNING *';
-      const messageSql =Database.executeQuery(sql, newMessage);
+      const sql = 'INSERT INTO messages_table (created_on,subject,messages,senderid,receiverid,parentmessageid,status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *';
+      
+      const messageSql = Database.executeQuery(sql, newMessage);
       messageSql.then((insertedMessage) => {
-        //   console.log(insertedMessage);
-        if (insertedMessage.rows.length) {
+           console.log(insertedMessage);
+        if (insertedMessage.rows) {
           return res.status(200).json(
-              {
-           
+              {    
             status: 200,
-            data: insertedMessage.rows,
+            data: rows,
+
           });
         }
   

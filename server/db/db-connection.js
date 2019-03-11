@@ -11,7 +11,7 @@ class Database {
       host: 'localhost',
       database: 'epic_mail',
       password: 'andela',
-      port: 5432
+      port: 5432 
     });
 
     this.connect = async () => this.pool.connect();
@@ -22,8 +22,7 @@ class Database {
     email VARCHAR(120) NOT NULL UNIQUE,
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
-    password VARCHAR(120) NOT NULL,
-    token VARCHAR(120)
+    password VARCHAR(120) NOT NULL
         );
         `;
     this.contactsTable = `
@@ -31,6 +30,7 @@ class Database {
         id SERIAL PRIMARY KEY,
         email VARCHAR(120) NOT NULL UNIQUE,
         firstname VARCHAR(30) NOT NULL,
+        othername VARCHAR(30) NOT NULL,
         lastname VARCHAR(30) NOT NULL
     );
     `;
@@ -40,7 +40,9 @@ class Database {
         created_on DATE NOT NULL,    
         subject VARCHAR(60) NOT NULL,
         messages VARCHAR(128) NOT NULL,
-        parent_message_id SERIAL REFERENCES user_Table ( id ) ON DELETE CASCADE,
+        senderid INTEGER REFERENCES user_table(id) ON DELETE CASCADE,
+        receiverid INTEGER REFERENCES user_table(id) ON DELETE CASCADE,
+        parentmessageid INTEGER NOT NULL,
         status VARCHAR(30) NOT NULL
     );
     `;

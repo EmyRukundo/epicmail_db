@@ -1,8 +1,9 @@
-import Database from '../db/db-connection';
+;import Database from '../db/db-connection';
 
-const users = async () => {
-  const sql = 'SELECT * FROM user_table';
-  const { rows } = await Database.executeQuery(sql);
-  return [...rows];
+const selectFrom = async (tableName, id = false) => {
+  
+  const sql = `SELECT * FROM user_table;`
+  return Database.executeQuery(sql);
 };
-export default users;
+
+export default selectFrom;
