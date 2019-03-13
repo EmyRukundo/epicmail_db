@@ -33,8 +33,12 @@ const registerUser = (req, res) => {
       });
     }).catch(error => res.status(500).json({
       status: 500,
-      error: `Internal server Error ${error}`,
+      error: `Oops The user is already exist`,
     }));
-  }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
+  }).catch(error => res.status(400).json({
+     status: 400, 
+     error: error.details[0].message, 
+    }));
 };
+
 export default registerUser;

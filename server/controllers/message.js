@@ -20,16 +20,17 @@ const getMessages = async (req, res) => res.json({
           error: err.details[0].message,
         });
       }
+      let userId = '';
     //   const dayMonthYear = result.happeningOn.split('/');
     //   const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
       const newMessage = [
         new Date(),
         result.subject,
         result.message,
-        req.params.id, //senderId
+        , //senderId
         req.params.id, //receiverid
         result.parentmessageid,
-        result.status,
+        result.status
 
       ];
       const sql = 'INSERT INTO messages_table (created_on,subject,messages,senderid,receiverid,parentmessageid,status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *';

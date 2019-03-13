@@ -20,7 +20,7 @@ const unknownUser = (req, res) => {
       const sql = `SELECT * FROM user_table WHERE email = '${userAccount.email}'`;
       const user = Database.executeQuery(sql);
       user.then((userResult) => {
-        if (userResult.rows.length) {
+        if (userResult.rows.length){
           if (Helper.comparePassword(userAccount.password, userResult.rows[0].password)) {
             jsonWebToken.sign({user: userResult.rows }, 'secret',(err,token)=>{
                   if(err){
@@ -30,11 +30,10 @@ const unknownUser = (req, res) => {
                   status: 200, 
                   data: userResult.rows,
                    token 
-                });
+                }); 
             });
           }
-        }
-        else {
+        }else{
           return res.status(403).json({ 
               status: 403, 
               error: 'wrong combination  username  or password' });
