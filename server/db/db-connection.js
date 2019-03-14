@@ -40,11 +40,11 @@ class Database {
         created_on DATE NOT NULL,    
         subject VARCHAR(60) NOT NULL,
         messages VARCHAR(128) NOT NULL,
-        senderid INTEGER REFERENCES user_table(id) ON DELETE CASCADE,
-        receiverid INTEGER REFERENCES user_table(id) ON DELETE CASCADE,
+        senderid INTEGER NOT NULL,
+        receiverid INTEGER NOT NULL,
         parentmessageid INTEGER NOT NULL,
         status VARCHAR(30) NOT NULL
-    );
+    );  
     `;
     this.sentTable = `
     CREATE TABLE IF NOT EXISTS sent_table(
@@ -62,7 +62,6 @@ class Database {
       created_on DATE NOT NULL
       
     )`;
-
     this.groupTable = `
     CREATE TABLE IF NOT EXISTS group_table (
         id SERIAL PRIMARY KEY,

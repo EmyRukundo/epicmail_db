@@ -13,10 +13,10 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/api/v1/',specificRouter);
+app.use('/api/v1/messages',specificRouter);
 app.use('/api/v1/auth/',userRouter);
 app.use('/api/v1/',messageRouter);
-app.use('/api/v1/',deleteRouter);
+app.use('/api/v1/messages',deleteRouter);
 app.use('/api/V1/',groupsRouter);
 
 app.get('/',(req,res)=>{
@@ -35,7 +35,8 @@ app.get((err,req,res,next) => {
 });
 
 
-const port = process.env.PORT || 3000;
+
+const port = process.env.PORT || 4000;
 app.listen(port, ()=> console.log(`Listening on port ${port}...`));
 
 export default app;

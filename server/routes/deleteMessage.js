@@ -4,7 +4,7 @@ import {deleteEmail} from '../controllers/message';
 
 const router = express.Router();
 
-router.delete('/messages/:id',deleteEmail);
+router.delete('/:id',deleteEmail);
 
 
 export default router;
