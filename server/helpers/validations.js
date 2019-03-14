@@ -21,7 +21,9 @@ const Validator = {
   }),
 
   groupSchema: joi.object().keys({
-    name: joi.string().required().min(1),
+    name: joi.string().required().min(4),
+    role: joi.string().required().min(2),
+    ownerid: joi.string().required(3)
   }),
  
   loginSchema: joi.object().keys({
@@ -29,10 +31,10 @@ const Validator = {
     password: joi.string().required(),
   }),
   validationOption: {
-    abortEarly: false,
-    allowUnknown: true,
+    abortEarly: true,
+    allowUnknown: false,
     stripUnknown: true,
   },
  
 };
-export default Validator;
+export default Validator; 

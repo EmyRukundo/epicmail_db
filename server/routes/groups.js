@@ -1,8 +1,9 @@
 import express from 'express';
-import {getGroups,createGroup,updateGroup,deleteGroup,groupMember,deleteMember,emailGroup} from '../controllers/groups';
+import {getGroups,createGroup,updateGroup,specificGroup,deleteGroup,groupMember,deleteMember,emailGroup} from '../controllers/groups';
 const router = express.Router();
 
 router.get('/groups',getGroups);
+router.get('/groups/:id',specificGroup);
 router.post('/groups',createGroup);
 router.patch('/groups/:id/:name',updateGroup);
 router.delete('/groups/:id',deleteGroup);

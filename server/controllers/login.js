@@ -4,8 +4,12 @@ import Database from '../db/db-connection';
 import Validation from '../helpers/validations';
 import Helper from '../helpers/helpers';
 
+//@CREATE NEW ACCOUNT
+
 const unknownUser = (req, res) => {
+
   joi.validate(req.body, Validation.loginSchema, Validation.validationOption,
+
      (err, result) => {
       if (err) {
         return res.status(400).json({
@@ -13,12 +17,15 @@ const unknownUser = (req, res) => {
           error: err.details,
         });
       }
+
       const userAccount = {
         email: result.email,
         password: result.password,
       };
+
       const sql = `SELECT * FROM user_table WHERE email = '${userAccount.email}'`;
       const user = Database.executeQuery(sql);
+
       user.then((userResult) => {
         if (userResult.rows.length){
           if (Helper.comparePassword(userAccount.password, userResult.rows[0].password)) {
@@ -36,7 +43,7 @@ const unknownUser = (req, res) => {
         }else{
           return res.status(403).json({ 
               status: 403, 
-              error: 'wrong combination  username  or password' });
+              error: 'wrong combination username  or password' });
         }
       }).catch(error => res.status(500).json({
            status: 500, 

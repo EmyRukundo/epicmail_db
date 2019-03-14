@@ -65,13 +65,15 @@ class Database {
     this.groupTable = `
     CREATE TABLE IF NOT EXISTS group_table (
         id SERIAL PRIMARY KEY,
-        group_name VARCHAR(128) NOT NULL
+        name VARCHAR(128) NOT NULL,
+        role VARCHAR(128) NOT NULL,
+        ownerid VARCHAR(128) NOT NULL
     );
     `;
 
     this.groupMembersTable = `
     CREATE TABLE IF NOT EXISTS group_members_table (
-          id SERIAL PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         group_id SERIAL REFERENCES group_table (id) ON DELETE CASCADE,
         user_role VARCHAR(128) NOT NULL
     );
