@@ -20,13 +20,16 @@ const getGroups = async (req, res) => res.json({
           error: err.details[0].message,
         });
     }
+    let userId = "";
+
       const newGroup = [
-        result.id,
+       
         result.name,
-        result.role  
+        result.role,
+        result.ownerid,
        
       ];
-      const sql = 'INSERT INTO group_table (id, name,role) VALUES ($1,$2,$3) RETURNING *';
+      const sql = 'INSERT INTO group_table (name,role,ownerid) VALUES ($1,$2,$3) RETURNING *';
       const groupSql =Database.executeQuery(sql, newGroup);
       groupSql.then((insertedGroup) => {
         if (insertedGroup.rows.length) {
@@ -49,21 +52,85 @@ const getGroups = async (req, res) => res.json({
     });
   };
 
+  //@GET SPECIFIC GROUP
+
+  const specificGroup = (req, res) => {
+
+    const sql = `SELECT * FROM group_table WHERE id = '${req.params.id}'`;
+
+    const groupSql = Database.executeQuery(sql);
+
+    groupSql.then((result) => {
+
+      if (result.rows.length) {
+
+        return res.status(200).json({
+
+          status: 200,
+          data: result.rows
+        });
+      }
+      return res.status(404).json({
+
+        status: 404,
+        error: 'a group with given id was not found!',
+
+      });
+    }).catch(error => res.status(500).json({
+
+      status: 500,
+      error: `Internal server error ${error}`,
+
+    }));
+  };
+//@ Get all groups owned by specific id
+
+// const  groupsOwned =(req, res) => {
+//   const groupsOwnedSql = 'SELECT * FROM group_table WHERE ownerid = $1';
+//   try {
+//     const { rows } = await pool.query(groupsOwnedSql, [req.user.id]);
+//     if (rows.length > 0) {
+//       let messages = [];
+//       rows.forEach(message => {
+//         messages.push(message);
+//       });
+//       return res.status(200).json({
+//         status: 200,
+//         data: messages,
+//       });
+//     }
+//     return res.status(400).json({
+//       status: 400,
+//       error: 'You have no groups',
+//     });
+//   } catch(error) {
+//     return res.status(400).send(error);
+//   }
+// },
+
+
+
+
+
+
+
   
 //@UPDATE GROUP Name
 
   const updateGroup = (req, res) => {
+
     const checkGroupSql = `SELECT * FROM group_table WHERE id  = '${req.params.id}'`;
     const isAvailable = Database.executeQuery(checkGroupSql);
     isAvailable.then((isValid) => {
       if (isValid.rows) {
         if (isValid.rows.length) {
-          joi.validate(req.body, Validation.groupSchema, Validation.validationOption)
-            .then((result) => {
-              let token = 0;
-              let decodedToken = '';
-              let userId = '';
-              if (req.headers.authorization) {
+          // joi.validate(req.body, Validation.groupSchema, Validation.validationOption)
+          //   .then((result) => {
+
+              // let token = 0;
+              // let decodedToken = '';
+              // let userId = '';
+          /*    if (req.headers.authorization) {
               // eslint-disable-next-line prefer-destructuring
                 token = req.headers.authorization.split(' ')[1];
                 decodedToken = jsonWebToken.verify(token, process.env.SECRETKEY);
@@ -71,13 +138,17 @@ const getGroups = async (req, res) => res.json({
               } else {
                 return res.sendStatus(403);
               }
+              */
 
               const sql = `UPDATE group_table SET name = '${name}' WHERE group_id = '${req.params.id}' RETURNING *`
 
               const editName = Database.executeQuery(sql);
               editName.then((updatenameResult) => {
+
                 if (updatenameResult.rows) {
+
                   if (updatenameResult.rows.length) {
+
                     return res.status(201).json({
                       status: 201,
                       data: updatenameResult.rows,
@@ -93,7 +164,7 @@ const getGroups = async (req, res) => res.json({
                 status: 500,
                 error: `Internal server error ${error}`,
               }));
-            }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
+            // }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
         }
       }
     })
@@ -103,31 +174,48 @@ const getGroups = async (req, res) => res.json({
 
 // @DELETE GROUP
 
-const deleteGroup = (req, res) => {
+const deleteGroup = async (req, res) => {
 
-    const id = req.params.id;
-    Database.query("SELECT * FROM group_table WHERE id=$1", [id],
-      (error, result) => {
-        if (error) {
-        //console.log(error);
-          return res.status(500).json(error);
-        }
-        if (result.rows.length === 0) {
-          return res.status(400).json({ error: "Sorry! no group found on this id." });
-        }
-        //@delete if it is available
-        pool.query("DELETE FROM group_table WHERE id=$1", [id],
-          (er, groupSql) => {
-            if (er) {
-              return res.status(500).json(er);
-            }
-            if (!groupSql) {
-              return res.status(500).json({ error: "something went wrong try again later" });
-            }
-            return res.status(200).json({ success: true, message: "you deleted a group successfully." });
-          });
-      });
-  };
+  const sql = `DELETE FROM group_table WHERE id = '${req.params.id}' RETURNING *`;
+
+  Database.executeQuery(sql).then((result) => {
+
+
+    res.status(202).json({ status: 202, message: "Deleted email successful" });
+    
+    // };
+
+  }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
+};
+
+
+
+
+// const deleteGroup = (req, res) => {
+
+//     const id = req.params.id;
+//     Database.executeQuery("SELECT * FROM group_table WHERE id=$1", [id],
+//       (error, result) => {
+//         if (error) {
+//         //console.log(error);
+//           return res.status(500).json(error);
+//         }
+//         if (result.rows.length === 0) {
+//           return res.status(400).json({ error: "Sorry! no group found on this id." });
+//         }
+//         //@delete if it is available
+//         pool.query("DELETE FROM group_table WHERE id=$1", [id],
+//           (er, groupSql) => {
+//             if (er) {
+//               return res.status(500).json(er);
+//             }
+//             if (!groupSql) {
+//               return res.status(500).json({ error: "something went wrong try again later" });
+//             }
+//             return res.status(200).json({ success: true, message: "you deleted a group successfully." });
+//           });
+//       });
+//   };
 
 
  //@Add a User to the group
@@ -263,8 +351,6 @@ const deleteMember = (req, res) => {
     });
   };
 
-
-
     export{
-        getGroups,createGroup,updateGroup,deleteGroup,groupMember,deleteMember,emailGroup
+        getGroups,createGroup,updateGroup,deleteGroup,groupMember,specificGroup,deleteMember,emailGroup
       };
