@@ -11,7 +11,7 @@ const getGroups = async (req, res) => res.json({
   });
 
 
-  //@Create Group
+  //@Create Groupg
   const createGroup = (req, res) => {
     joi.validate(req.body, Validation.groupSchema, Validation.validationOption, async (err, result) => {
       if (err) {
@@ -20,18 +20,24 @@ const getGroups = async (req, res) => res.json({
           error: err.details[0].message,
         });
     }
-    let userId = "";
 
       const newGroup = [
        
         result.name,
         result.role,
         result.ownerid,
-       
+    
       ];
       const sql = 'INSERT INTO group_table (name,role,ownerid) VALUES ($1,$2,$3) RETURNING *';
       const groupSql =Database.executeQuery(sql, newGroup);
       groupSql.then((insertedGroup) => {
+
+        const ownerSql ='SELECT * FROM user_table where ownerid =$id';
+        const groupSql =Database.executeQuery(ownerSql, checkSql);
+        
+       
+        
+
         if (insertedGroup.rows.length) {
           return res.status(200).json({
             status: 200,

@@ -4,7 +4,7 @@ import Database from '../db/db-connection';
 import Validation from '../helpers/validations';
 import Helper from '../helpers/helpers';
 
-//@CREATE NEW ACCOUNT
+//@@LOGIN 
 
 const unknownUser = (req, res) => {
 
