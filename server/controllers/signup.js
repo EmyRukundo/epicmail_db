@@ -20,6 +20,7 @@ const registerUser = (req, res) => {
     const user = Database.executeQuery(sql, newUser);
     user.then((userResult) => {
         // console.log(userResult);
+        
       if (userResult.rows.length) {
         return res.status(201).json({
           status: 201,
@@ -31,8 +32,8 @@ const registerUser = (req, res) => {
         status: 400,
         error: 'Failed to signup',
       });
-    }).catch(error => res.status(500).json({
-      status: 500,
+    }).catch(error => res.status(400).json({
+      status: 400,
       error: `Oops The user is already exist`,
     }));
   }).catch(error => res.status(400).json({

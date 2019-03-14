@@ -8,4 +8,5 @@ const getUsers = async (req, res) => {
   }).catch(error => res.status(500).json({ status: 500, error: `Internal server error : ${error}` }));
 };
 
+
 export default getUsers;

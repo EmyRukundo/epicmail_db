@@ -11,7 +11,11 @@ const Validator = {
   }),
   messageSchema: joi.object().keys({
     subject: joi.string().required(),
-    message: joi.string().required(),
+    messages: joi.string().required(),
+    senderid: joi.string().required(),
+    receiverid: joi.string().required(),
+    parentmessageid: joi.string().required(),
+    status: joi.string().required(),
     // parent_message_id: joi.string().required(),
     // ​status: joi.string().required()
   }),
