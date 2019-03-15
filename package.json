@@ -7,7 +7,6 @@
     "migrate": "node --require babel-register server/db/db-connection.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --require babel-core/register --require babel-polyfill  app.js"
-    
   },
   "engines": {
     "node": "10.x"
@@ -35,7 +34,9 @@
     "jsonwebtoken": "^8.5.0",
     "morgan": "^1.9.1",
     "pg": "^7.8.1",
-    "uuid": "^3.3.2"
+    "swagger-ui-express": "^4.0.2",
+    "uuid": "^3.3.2",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
