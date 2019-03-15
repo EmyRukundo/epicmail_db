@@ -6,7 +6,7 @@
   "scripts": {
     "migrate": "node --require babel-register server/db/db-connection.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --require babel-core/register --require babel-polyfill  app.js"
+    "start": "babel-node app.js"
     
   },
   "engines": {
