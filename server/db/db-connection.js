@@ -67,7 +67,7 @@ class Database {
         id SERIAL PRIMARY KEY,
         name VARCHAR(128) NOT NULL,
         role VARCHAR(128) NOT NULL,
-        ownerid VARCHAR(128) NOT NULL
+        ownerid SERIAL REFERENCES user_table (id) ON DELETE CASCADE
     );
     `;
 

@@ -1,8 +1,8 @@
+import joi from 'joi';
+import jsonWebToken from 'jsonwebtoken';
 import Database from '../db/db-connection';
 import Validation from '../helpers/validations';
 import groups from'../models/groups.js';
-import joi from 'joi';
-
 
 //@get all messages
 const getGroups = async (req, res) => res.json({
@@ -19,37 +19,56 @@ const getGroups = async (req, res) => res.json({
           status: 400,
           error: err.details[0].message,
         });
+      }
+
+      let token = 0;
+    let decodedToken = '';
+    let userId = '';
+    if (req.headers.authorization) {
+      token = req.headers.authorization.split(' ')[1];
+      decodedToken = jsonWebToken.verify(token, 'secret');
+      userId = decodedToken.user[0].id;
+    } else {
+      return res.status(403).json({
+        status: 403,
+        error:"you are not authorised to create a group",
+      });
     }
+
+
+
+    //   if (err) {
+    //     return res.json({
+    //       status: 400,
+    //       error: err.details[0].message,
+    //     });
+    // }
 
       const newGroup = [
        
         result.name,
         result.role,
-        result.ownerid,
+        userId,
     
       ];
       const sql = 'INSERT INTO group_table (name,role,ownerid) VALUES ($1,$2,$3) RETURNING *';
       const groupSql =Database.executeQuery(sql, newGroup);
-      groupSql.then((insertedGroup) => {
-
-        const ownerSql ='SELECT * FROM user_table where ownerid =$id';
-        const groupSql =Database.executeQuery(ownerSql, checkSql);
-        
-       
-        
-
-        if (insertedGroup.rows.length) {
-          return res.status(200).json({
-            status: 200,
-            data: insertedGroup.rows,
+      
+      groupSql.then((groupResult) => {
+        if (groupResult.rows.length!==0) {
+          return res.status(201).json({
+            status: 201,
+            data: groupResult.rows,
           });
         }
-  
         return res.status(400).json({
           status: 400,
-          error: " Cant not create a group",
+          error: 'Group could not be created',
         });
-      });
+      }).catch(error => res.status(500).json({
+        status: 500,
+        error: `Internal server error ${error}`,
+      }));
     }).catch((error) => {
       res.status(500).json({
         status: 500,
@@ -57,6 +76,33 @@ const getGroups = async (req, res) => res.json({
       });
     });
   };
+  
+
+
+  //     groupSql.then((insertedGroup) => {
+
+  //       const ownerSql ='SELECT * FROM user_table where ownerid =$id';
+  //       const groupSql =Database.executeQuery(ownerSql, checkSql);
+        
+  //       if (insertedGroup.rows.length) {
+  //         return res.status(200).json({
+  //           status: 200,
+  //           data: insertedGroup.rows,
+  //         });
+  //       }
+  
+  //       return res.status(400).json({
+  //         status: 400,
+  //         error: " Cant not create a group",
+  //       });
+  //     });
+  //   }).catch((error) => {
+  //     res.status(500).json({
+  //       status: 500,
+  //       error: `Internal server error ${error}`,
+  //     });
+  //   });
+  // };
 
   //@GET SPECIFIC GROUP
 
