@@ -29,8 +29,6 @@ app.get('/',(req,res)=>{
 
 app.get('/*',(req,res)=>{
 
-
-
 });
 
 app.get((err,req,res,next) => {
@@ -41,7 +39,4 @@ app.get((err,req,res,next) => {
 const port = process.env.PORT || 4000;
 app.listen(port, ()=> console.log(`Listening on port ${port}...`));
 
-
-
 export default app;
-
