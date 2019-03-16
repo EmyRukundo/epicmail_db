@@ -74,9 +74,9 @@ class Database {
     this.groupMembersTable = `
     CREATE TABLE IF NOT EXISTS group_members_table (
         id SERIAL PRIMARY KEY,
-        group_id VARCHAR(128) NOT NULL,
-        user_id VARCHAR(128) NOT NULL,
-        user_role VARCHAR(128) NOT NULL
+        groupid VARCHAR(128) NOT NULL,
+        userid VARCHAR(128) NOT NULL,
+        userole VARCHAR(128) NOT NULL
     );
     `;
     this.initializeDb();

@@ -14,7 +14,7 @@ const unknownUser = (req, res) => {
       if (err) {
         return res.status(400).json({
           status: 400,
-          error: err.details,
+          error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
 

@@ -16,11 +16,11 @@ app.use('/doc',swagger.serve, swagger.setup(swaggerDocumment));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/api/v1/messages',specificRouter);
-app.use('/api/v1/auth/',userRouter);
-app.use('/api/v1/',messageRouter);
-app.use('/api/v1/messages',deleteRouter);
-app.use('/api/V1/',groupsRouter);
+app.use('/api/v2/messages',specificRouter);
+app.use('/api/v2/auth/',userRouter);
+app.use('/api/v2/',messageRouter);
+app.use('/api/v2/messages',deleteRouter);
+app.use('/api/V2/',groupsRouter);
 
 app.get('/',(req,res)=>{
 

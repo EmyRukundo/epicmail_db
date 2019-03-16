@@ -18,7 +18,7 @@ const getMessages = async (req, res) => res.json({
       if (err) {
         return res.json({
           status: 400,
-          error: err.details[0].message,
+          error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
       // let userId = '';

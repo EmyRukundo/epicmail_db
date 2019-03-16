@@ -17,7 +17,7 @@ import groups from'../models/groups.js';
       if (err) {
         return res.json({
           status: 400,
-          error: err.details[0].message,
+          error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
 
@@ -175,7 +175,7 @@ console.log(result)
             if (err) {
               return res.json({
                 status: 400,
-                error: err.details[0].message,
+                error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
               });
             }
             
@@ -207,7 +207,7 @@ console.log(result)
                 status: 500,
                 error: `Internal server error ${error}`,
               }));
-            }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
+            }).catch(error => res.status(400).json({ status: 400, error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,'')}));
         }
       }
     })
@@ -414,7 +414,7 @@ const deleteMember = (req, res) => {
       if (err) {
         return res.json({
           status: 400,
-          error: err.details[0].message,
+          error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
       const dayMonthYear = result.happeningOn.split('/');
@@ -447,7 +447,7 @@ const deleteMember = (req, res) => {
     }).catch((error) => {
       res.status(500).json({
         status: 500,
-        error: `Internal server error ${error}`,
+        error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
       });
     });
   };

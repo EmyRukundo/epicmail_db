@@ -50,7 +50,7 @@ const registerUser = (req, res) => {
     }));
   }).catch(error => res.status(400).json({
      status: 400, 
-     error: error.details[0].message, 
+     error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
     }));
 };
 
