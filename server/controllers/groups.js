@@ -5,13 +5,13 @@ import Validation from '../helpers/validations';
 import groups from'../models/groups.js';
 
 //@get all messages
-const getGroups = async (req, res) => res.json({
-    status: 200,
-    data:await groups(),
-  });
+// const getGroups = async (req, res) => res.json({
+//     status: 200,
+//     data:await groups(),
+//   });
 
 
-  //@Create Groupg
+  //@@ CREATE GROUP
   const createGroup = (req, res) => {
     joi.validate(req.body, Validation.groupSchema, Validation.validationOption, async (err, result) => {
       if (err) {
@@ -34,15 +34,6 @@ const getGroups = async (req, res) => res.json({
         error:"you are not authorised to create a group",
       });
     }
-
-
-
-    //   if (err) {
-    //     return res.json({
-    //       status: 400,
-    //       error: err.details[0].message,
-    //     });
-    // }
 
       const newGroup = [
        
@@ -76,33 +67,53 @@ const getGroups = async (req, res) => res.json({
       });
     });
   };
+
+  const getGroups = (req, res) => {
+   
+      let token = 0;
+    let decodedToken = '';
+    let userId = '';
+    if (req.headers.authorization) {
+      token = req.headers.authorization.split(' ')[1];
+      decodedToken = jsonWebToken.verify(token, 'secret');
+      userId = decodedToken.user[0].id;
+    } else {
+      return res.status(403).json({
+        status: 403,
+        error:"you are not authorised to get any group",
+      });
+    }
+    const sql = `SELECT * FROM group_table WHERE id = '${userId}'`;
+    const groupSql = Database.executeQuery(sql);
+      
+    groupSql.then((result) => {
+
+      if (result.rows.length) {
+
+        return res.status(200).json({
+
+          status: 200,
+          data: result.rows
+        });
+      }
+      return res.status(404).json({
+
+        status: 404,
+        error: 'No group with the given ID!',
+
+      });
+    }).catch(error => res.status(500).json({
+
+      status: 500,
+      error: `Internal server error ${error}`,
+
+    }));
+  };
+
+
+
+
   
-
-
-  //     groupSql.then((insertedGroup) => {
-
-  //       const ownerSql ='SELECT * FROM user_table where ownerid =$id';
-  //       const groupSql =Database.executeQuery(ownerSql, checkSql);
-        
-  //       if (insertedGroup.rows.length) {
-  //         return res.status(200).json({
-  //           status: 200,
-  //           data: insertedGroup.rows,
-  //         });
-  //       }
-  
-  //       return res.status(400).json({
-  //         status: 400,
-  //         error: " Cant not create a group",
-  //       });
-  //     });
-  //   }).catch((error) => {
-  //     res.status(500).json({
-  //       status: 500,
-  //       error: `Internal server error ${error}`,
-  //     });
-  //   });
-  // };
 
   //@GET SPECIFIC GROUP
 
@@ -159,14 +170,7 @@ const getGroups = async (req, res) => res.json({
 //     return res.status(400).send(error);
 //   }
 // },
-
-
-
-
-
-
-
-  
+ 
 //@UPDATE GROUP Name
 
   const updateGroup = (req, res) => {
