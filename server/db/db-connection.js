@@ -75,6 +75,7 @@ class Database {
     CREATE TABLE IF NOT EXISTS group_members_table (
         id SERIAL PRIMARY KEY,
         group_id SERIAL REFERENCES group_table (id) ON DELETE CASCADE,
+        user_id SERIAL REFERNCES user_table
         user_role VARCHAR(128) NOT NULL
     );
     `;
