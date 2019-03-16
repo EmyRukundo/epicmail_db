@@ -283,81 +283,103 @@ const deleteGroup = async (req, res) => {
 
  //@Add a User to the group
 
- const groupMember = (req, res) => {
+ const groupMember = (err,res,result) => {
   
-  let token = 0;
-  let decodedToken = '';
-  let userId = '';
-  if (req.headers.authorization) {
-    token = req.headers.authorization.split(' ')[1];
-    decodedToken = jsonWebToken.verify(token, 'secret');
-    userId = decodedToken.user[0].id;
-  } else {
-    return res.status(403).json({
-      status: 403,
-      error:" Oops,you are not authorised!!!!",
-    });
-  }
-    const checkgroupSql = `SELECT * FROM group_table WHERE ownerid = '${userId}'`;
-    const isAvailable = Database.executeQuery(checkgroupSql);
-    const groupid = checkgroupSql.id;
-    isAvailable.then((isValid) => {
-      if (isValid.rows) {
-        if (isValid.rows.length) {
+  // let token = 0;
+  // let decodedToken = '';
+  // let userId = '';
+  // if (req.headers.authorization) {
+  //   token = req.headers.authorization.split(' ')[1];
+  //   decodedToken = jsonWebToken.verify(token, 'secret');
+  //   userId = decodedToken.user[0].id;
+  // } else {
+  //   return res.status(403).json({
+  //     status: 403,
+  //     error:" Oops,you are not authorised!!!!",
+  //   });
+  // }
+    // const checkgroupSql = `SELECT * FROM group_table WHERE ownerid = '${userId}'`;
+    // const isAvailable = Database.executeQuery(checkgroupSql);
+    // const groupid = checkgroupSql.id;
+    // isAvailable.then((isValid) => {
+    //   if (isValid.rows) {
+    //     if (isValid.rows.length) {
           // joi.validate(req.body, Validation.groupSchema, Validation.validationOption) .then((result) => {
-             
-              const sql = `INSERT INTO group_members_table (group_id,user_id,user_role)
-           VALUES ($1,$2,$3) RETURNING *`;
-           
-          //  const newMember = [
-          //   groupid,
-          //   result.userid,  
-          //   ​result.userRole
-
-          // ];
-          const newMember = [
-            groupid,
-            result.userid,
-            result.userRole,
+                            
+          //   const newMember = [
+          //     result.groupid,
+          //     result.userid,
+          //     result.userRole,
+                        
+          //   ];
             
-        
-          ];
-              
-         
-
-              const user = Database.executeQuery(sql, newMember);
-              user.then((userResult) => {
-                if (userResult.rows) {
-                  if (userResult.rows.length) {
-                    return res.status(201).json({
-                      status: 201,
-                      data: userResult.rows,
-                    });
-                  }
-                }
+          //     const sql = `INSERT INTO group_members_table(group_id,user_id,user_role)
+          //  VALUES ($1,$2,$3) RETURNING *`;
   
-                return res.status(400).json({
-                  status: 400,
-                  error: 'you can not add anyone'
-                });
-              }).catch(error => res.status(500).json({
-                status: 500,
-                error: `Internal server error ${error}`,
-              }));
+               
+          //     const user = Database.executeQuery(sql, newMember);
+          //     user.then((userResult) => {
+               
+          //       // if (userResult.rows) {
+          //         if (userResult.rows.length) {
+          //           console.log(userResult.rows);
+          //             return res.status(200).json({
+          //             status: 200,
+          //             data: userResult.rows,
+          //           });
+          //         }
+          //       // }
+  
+          //       return res.status(400).json({
+          //         status: 400,
+          //         error: 'you can not add anyone'
+          //       });
+          //     }).catch(error => res.status(500).json({
+          //       status: 500,
+          //       error: `Internal server error ${error}`,
+          //     }));
             // }).catch(error => res.status(400).json({ status: 400, error: [...error.details] }));
-        }
-      } else {
-        return res.status(400)
-          .json({ status: 400, error: 'Error : can not create user to a non existing group' });
-      }
-    }).catch(error => res.status(500).json({ status: 500, error: `Server error: ${error}` }));
-  };
+    //     }
+    //   } else {
+    //     return res.status(400)
+    //       .json({ status: 400, error: 'Error : can not create user to a non existing group' });
+    //   }
+    // }).catch(error => res.status(500).json({ status: 500, error: `Server error: ${error}` }));
+
+        const newMember = [
+    
+          result.groupid,
+          result.userid,
+          result.userole
+        ];
+        const sql = 'INSERT INTO group_members_table (group_id,user_id,user_role) VALUES ($1,$2,$3) RETURNING *';
+        const membernew =Database.executeQuery(sql, newMember);
+        membernew.then((insertedMember) => {
+          console.log(insertedMember);
+          if (insertedMember.rows) {
+            return res.status(200).json({
+              status: 200,
+              data: insertedMember.rows,
+            });
+          }
+    
+          return res.status(400).json({
+            status: 400,
+            error: " Cant not save data in the database",
+          });
+        });
+      // }).catch((error) => {
+      //   res.status(500).json({
+      //     status: 500,
+      //     error: `Internal server error ${error}`,
+      //   });
+      // });
+    };
+    
+
   
-
-
 
   // @DELETE A MEMBER OF A GROUP
-
 const deleteMember = (req, res) => {
 
     const id = req.params.id;

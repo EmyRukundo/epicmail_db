@@ -7,7 +7,7 @@ router.get('/groups/:id',specificGroup);
 router.post('/groups',createGroup);
 router.patch('/groups/:id/name',updateGroup);
 router.delete('/groups/:id',deleteGroup);
-router.post('/groups/:id/users',groupMember);
+router.post('/groups/users',groupMember);
 router.delete('/groups/:groupId/users/:id',deleteMember);
 router.post('/groups/:groupId/messages',emailGroup)
 

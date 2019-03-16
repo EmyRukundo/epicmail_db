@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
-// import Helper from '../helpers/helpers';
+
 
 dotenv.config();
 
@@ -74,8 +74,8 @@ class Database {
     this.groupMembersTable = `
     CREATE TABLE IF NOT EXISTS group_members_table (
         id SERIAL PRIMARY KEY,
-        group_id SERIAL REFERENCES group_table (id) ON DELETE CASCADE,
-        user_id SERIAL REFERNCES user_table
+        group_id VARCHAR(128) NOT NULL,
+        user_id VARCHAR(128) NOT NULL,
         user_role VARCHAR(128) NOT NULL
     );
     `;
