@@ -13,6 +13,7 @@ const swaggerDocumment = yamljs.load('server/swagger/document.yml');
 const app = express();
 app.use('/doc',swagger.serve, swagger.setup(swaggerDocumment));
 
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 

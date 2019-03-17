@@ -33,6 +33,12 @@ const Validator = {
     email: joi.string().email().required(),
     password: joi.string().required(),
   }),
+  
+  groupMemberSchema: joi.object().keys({
+    groupid: joi.string().required(),
+    userid: joi.string().required(),
+    userole: joi.string().required(),
+  }),
   validationOption: {
     abortEarly: false,
     allowUnknown: false,
