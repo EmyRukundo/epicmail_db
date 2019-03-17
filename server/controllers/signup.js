@@ -4,7 +4,7 @@ import Validation from '../helpers/validations';
 import Helper from '../helpers/helpers';
 import Database from '../db/db-connection';
 
- //@@ CREATE A NEW COUNT
+ //@@ CREATE A NEW USER
 
 const registerUser = (req, res) => {
   joi.validate(req.body, Validation.userSchema, Validation.validationOption).then((result) => {
@@ -23,32 +23,20 @@ const registerUser = (req, res) => {
     user.then((userResult) => {
         
         
-      if (userResult.rows.length) {
-     
+      if (userResult.rows.length) { 
      jsonWebToken.sign({user: userResult.rows }, 'secret',(err,token)=>{
-      if(err){
-     console.log(err);
-      }else { 
-
         return res.status(201).json({
           status: 201,
           data: userResult.rows,token
         });
-      }
-    });
-
-
-      }
-
-      return res.status(400).json({
-        status: 400,
-        error: 'Failed to signup',
-      });
-    }).catch(error => res.status(400).json({
+      
+    })}
+      
+    }).catch(error=> res.status(400).json({
       status: 400,
       error: `Oops The user is already exist`,
     }));
-  }).catch(error => res.status(400).json({
+  }).catch(err => res.status(400).json({
      status: 400, 
      error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
     }));

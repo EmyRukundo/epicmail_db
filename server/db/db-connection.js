@@ -79,6 +79,16 @@ class Database {
         userole VARCHAR(128) NOT NULL
     );
     `;
+    this.emailgroupTable = `
+    CREATE TABLE IF NOT EXISTS emailgroup_table (
+        id SERIAL PRIMARY KEY,
+        created_on DATE NOT NULL,    
+        subject VARCHAR(60) NOT NULL,
+        messages VARCHAR(128) NOT NULL,
+        parentMessageId INTEGER NOT NULL,
+        status VARCHAR(30) NOT NULL
+    );  
+    `;
     this.initializeDb();
   }
 
@@ -106,6 +116,7 @@ class Database {
     await this.executeQuery(this.inboxTable);
     await this.executeQuery(this.groupTable);
     await this.executeQuery(this.groupMembersTable);
+    await this.executeQuery(this.emailgroupTable);
   }
 }
 export default new Database();

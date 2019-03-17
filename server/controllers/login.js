@@ -17,7 +17,6 @@ const unknownUser = (req, res) => {
           error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
-
       const userAccount = {
         email: result.email,
         password: result.password,
@@ -43,7 +42,7 @@ const unknownUser = (req, res) => {
         }else{
           return res.status(403).json({ 
               status: 403, 
-              error: 'wrong combination username  or password' });
+              error: 'wrong combination of username  or password' });
         }
       }).catch(error => res.status(500).json({
            status: 500, 
@@ -51,4 +50,3 @@ const unknownUser = (req, res) => {
     });
 };
 export default unknownUser;
-

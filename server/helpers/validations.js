@@ -14,7 +14,7 @@ const Validator = {
     messages: joi.string().required(),
     senderid: joi.string().required(),
     receiverid: joi.string().required(),
-    parentmessageid: joi.string().required(),
+    parentmessageid: joi.number().integer().required(),
     status: joi.string().required(),
     // parent_message_id: joi.string().required(),
     // ​status: joi.string().required()
@@ -38,6 +38,13 @@ const Validator = {
     groupid: joi.string().required(),
     userid: joi.string().required(),
     userole: joi.string().required(),
+    
+  }),
+  emailgroupSchema: joi.object().keys({
+    subject: joi.string().required(),
+    message: joi.string().required(),
+    parentMessageId: joi.number().integer().required(),
+    status: joi.string().required(),
   }),
   validationOption: {
     abortEarly: false,

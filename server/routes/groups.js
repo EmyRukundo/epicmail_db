@@ -9,7 +9,7 @@ router.patch('/groups/:id/name',updateGroup);
 router.delete('/groups/:id',deleteGroup);
 router.post('/groups/users',groupMember);
 router.delete('/groups/:groupId/users/:id',deleteMember);
-router.post('/groups/:groupId/messages',emailGroup)
+router.post('/groups/groupId/messages',emailGroup)
 
 
 export default router;
