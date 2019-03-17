@@ -230,103 +230,175 @@ const deleteGroup = async (req, res) => {
     } else {
       return res.status(403).json({
         status: 403,
-        error:" Oops,you are not authorised to delete any group!!",
+        error:" Oops,you are not authorised!!",
       });
     }
     const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
     const isAvailable = Database.executeQuery(checkGroupSql);
+    
     isAvailable.then((isValid) => {
+      if(!isValid) res.status(404).send('The Email with the given ID was not found');
       if (isValid.rows) {
         if (isValid.rows.length) {
-          
-  const sql = `DELETE FROM group_table WHERE id = '${req.params.id}' RETURNING *`;
+           
+  const sql = `DELETE FROM group_table WHERE id = '${req.params.id}' and ownerid='${userId}' RETURNING *`;
 
   Database.executeQuery(sql).then((result) => {
     
     res.status(202).json({ status:202,data:result.rows, message: "Deleted group successful" });
     
-    
-
   }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
 };
       }
 })
 }
 
+//@@ GET A SPECIFIC GROUP
 
+// const specificGroup = (req, res) => {
 
-// const deleteGroup = (req, res) => {
+// const sql = `SELECT * FROM group_table WHERE id = '${req.params.id}'`;
 
-//     const id = req.params.id;
-//     Database.executeQuery("SELECT * FROM group_table WHERE id=$1", [id],
-//       (error, result) => {
-//         if (error) {
-//         //console.log(error);
-//           return res.status(500).json(error);
-//         }
-//         if (result.rows.length === 0) {
-//           return res.status(400).json({ error: "Sorry! no group found on this id." });
-//         }
-//         //@delete if it is available
-//         pool.query("DELETE FROM group_table WHERE id=$1", [id],
-//           (er, groupSql) => {
-//             if (er) {
-//               return res.status(500).json(er);
-//             }
-//             if (!groupSql) {
-//               return res.status(500).json({ error: "something went wrong try again later" });
-//             }
-//             return res.status(200).json({ success: true, message: "you deleted a group successfully." });
-//           });
+// const groupSql = Database.executeQuery(sql);
+
+//   groupSql.then((result) => {
+
+//     if (result.rows.length) {
+
+//       return res.status(200).json({
+
+//         status: 200,
+//         data: result.rows
 //       });
-//   };
+//     }
+//     return res.status(404).json({
 
+//       status: 404,
+//       error: 'a group with given id was not found!',
 
- //@Add a User to the group
+//     });
+//   }).catch(error => res.status(500).json({
 
- const groupMember = (req, res) => {
-  joi.validate(req.body, Validation.groupMemberSchema, Validation.validationOption, async (err, result) => {
-    if (err) {
-      return res.json({
-        status: 400,
-        error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
-      });
-    }
-    const newMember = [
-     
-      result.groupid,
-      result.userid,
-      result.userole
+//     status: 500,
+//     error: `Internal server error ${error}`,
 
-    ];
-    const sql = 'INSERT INTO members_table (groupid,userid,userole) VALUES ($1,$2,$3) RETURNING *';
-    
-    const memberSql = Database.executeQuery(sql, newMember);
-    memberSql.then((insertedMember) => {    
-      if (insertedMember.rows) {
-        return res.status(200).json(
-            {    
-          status: 200,
-          data: insertedMember.rows,
+//   }));
+// };
 
-        });
+//@@ ADD USER TO THE GROUP
+
+const groupMember = (req, res) => {
+
+  let token = 0;
+  let decodedToken = '';
+  let userId = '';
+  if (req.headers.authorization) {
+    token = req.headers.authorization.split(' ')[1];
+    decodedToken = jsonWebToken.verify(token, 'secret');
+    userId = decodedToken.user[0].id;
+  } else {
+    return res.status(403).json({
+      status: 403,
+      error:"Oops, App does not known you!",
+    });
+  }
+
+  const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
+  const isAvailable = Database.executeQuery(checkGroupSql);
+  isAvailable.then((isValid) => {
+    if (isValid.rows) {
+      if (isValid.rows.length) {
+        joi.validate(req.body, Validation.groupMemberSchema, Validation.validationOption, async (err, result) => {
+          if (err) {
+            return res.json({
+              status: 400,
+              error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
+            });
+          }    
+          const member=[
+            req.params.id,
+            req.body.userId,
+            req.body.userole
+            
+          ]
+          const sql='INSERT INTO members_table (groupid,userid,userole) VALUES ($1,$2,$3) RETURNING *';
+             
+
+            const addMember = Database.executeQuery(sql,member);
+            addMember.then((memberResult) => {
+       console.log(memberResult.rows);
+              if (memberResult.rows) {
+
+                if (memberResult.rows.length) {
+
+                  return res.status(201).json({
+                    status: 201,
+                    data: memberResult.rows,
+                  });
+                }
+              }
+              return res.status(400).json({
+                status: 400,
+                error: 'You do not own this group ',
+              });
+            }).catch(error => res.status(500).json({
+              status: 500,
+              error: `Internal server error ${error}`,
+            }));
+          }).catch(err => res.status(500).json({
+             status: 500, 
+             error:"Internal server error"
+            }));
       }
-
-      return res.status(400).json({
-        status: 400,
-        error: " Cant not save data in the database",
-      });
-    });
-  }).catch((error) => {
-    res.status(500).json({
-      status: 500,
-      error: `Internal server error ${error}`,
-    });
-  });
+    }
+  })
 };
 
 
-  
+
+
+ 
+
+//  const groupMember = (req, res) => {
+//   joi.validate(req.body, Validation.groupMemberSchema, Validation.validationOption, async (err, result) => {
+//     if (err) {
+//       return res.json({
+//         status: 400,
+//         error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
+//       });
+//     }
+//     const newMember = [
+     
+//       result.groupid,
+//       result.userid,
+//       result.userole
+
+//     ];
+//     const sql = 'INSERT INTO members_table (groupid,userid,userole) VALUES ($1,$2,$3) RETURNING *';
+    
+//     const memberSql = Database.executeQuery(sql, newMember);
+//     memberSql.then((insertedMember) => {    
+//       if (insertedMember.rows) {
+//         return res.status(200).json(
+//             {    
+//           status: 200,
+//           data: insertedMember.rows,
+
+//         });
+//       }
+
+//       return res.status(400).json({
+//         status: 400,
+//         error: " Cant not save data in the database",
+//       });
+//     });
+//   }).catch((error) => {
+//     res.status(500).json({
+//       status: 500,
+//       error: `Internal server error ${error}`,
+//     });
+//   });
+// };
 
   // @DELETE A MEMBER FROM A SPECIFIC GROUP
 

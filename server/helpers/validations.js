@@ -35,7 +35,6 @@ const Validator = {
   }),
   
   groupMemberSchema: joi.object().keys({
-    groupid: joi.string().required(),
     userid: joi.string().required(),
     userole: joi.string().required(),
     
