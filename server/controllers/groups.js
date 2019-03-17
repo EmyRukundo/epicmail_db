@@ -402,72 +402,77 @@ const groupMember = (req, res) => {
 
   // @DELETE A MEMBER FROM A SPECIFIC GROUP
 
-const deleteMember = (req, res) => {
-
-  let token = 0;
-    let decodedToken = '';
-    let userId = '';
-    if (req.headers.authorization) {
-      token = req.headers.authorization.split(' ')[1];
-      decodedToken = jsonWebToken.verify(token, 'secret');
-      userId = decodedToken.user[0].id;
-    } else {
-      return res.status(403).json({
-        status: 403,
-        error:" Oops,you are not authorised to delete any group!!",
-      });
-    }
-    const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
-    const isAvailable = Database.executeQuery(checkGroupSql);
-    isAvailable.then((isValid) => {
-      if (isValid.rows) {
-        if (isValid.rows.length) {
-          
-  const sql = `DELETE FROM members_table WHERE groupid = '${req.params.groupid}' and userid ='${req.params.id}' RETURNING *`;
-
-  Database.executeQuery(sql).then((result) => {
-    
-    res.status(202).json({ status:202,data:result.rows, message: "Deleted user successful" });
-    
-    
-
-  }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
-};
+  const deleteMember = async (req, res) => {
+    let token = 0;
+      let decodedToken = '';
+      let userId = '';
+      if (req.headers.authorization) {
+        token = req.headers.authorization.split(' ')[1];
+        decodedToken = jsonWebToken.verify(token, 'secret');
+        userId = decodedToken.user[0].id;
+      } else {
+        return res.status(403).json({
+          status: 403,
+          error:" Oops,you are not authorised!!",
+        });
       }
-})
-
-
-
-
-
-
-
-
-
-
-    // const id = req.params.id;
-    // Database.query("SELECT * FROM groupMember_table WHERE id=$1", [id],
-    //   (error, result) => {
-    //     if (error) {
-    //     //console.log(error);
-    //       return res.status(500).json(error);
-    //     }
-    //     if (result.rows.length === 0) {
-    //       return res.status(400).json({ error: "Sorry! this member doesn't exist" });
-    //     }
-    //     //@delete if he/she is available
-    //     pool.query("DELETE FROM groupMember_table WHERE id=$1", [id],
-    //       (er, groupSql) => {
-    //         if (er) {
-    //           return res.status(500).json(er);
-    //         }
-    //         if (!groupSql) {
-    //           return res.status(500).json({ error: "something went wrong try again later" });
-    //         }
-    //         return res.status(200).json({ success: true, message: "you deleted a group successfully." });
-    //       });
-    //   });
+      const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
+      const isAvailable = Database.executeQuery(checkGroupSql);
+      
+      isAvailable.then((isValid) => {      
+        if (isValid.rows) {
+          if (isValid.rows.length) {
+             
+    const sql = `DELETE FROM members_table WHERE groupid='${req.params.groupid}' and userid='${req.params.id}' RETURNING *`;
+  
+    Database.executeQuery(sql).then((result) => {
+      
+      res.status(202).json({ status:202,data:result.rows, message: "Deleted user successful" });
+      
+    }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
   };
+        }
+  }).catch(error => res.status(500).json({ status: 500, error: ` error ${error}` }));
+  }
+
+
+
+// const deleteMember = (req, res) => {
+
+//   let token = 0;
+//     let decodedToken = '';
+//     let userId = '';
+//     if (req.headers.authorization) {
+//       token = req.headers.authorization.split(' ')[1];
+//       decodedToken = jsonWebToken.verify(token, 'secret');
+//       userId = decodedToken.user[0].id;
+//     } else {
+//       return res.status(403).json({
+//         status: 403,
+//         error:" Oops,you are not authorised to delete any group!!",
+//       });
+//     }
+//     const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
+//     const isAvailable = Database.executeQuery(checkGroupSql);
+//     isAvailable.then((isValid) => {
+//       if (isValid.rows) {
+//         if (isValid.rows.length) {
+//           const groupid = req.params.groupid;
+    
+          
+//   const sql = `DELETE FROM members_table WHERE groupid = '${groupid}' and userid ='${req.params.id}' RETURNING *`;
+//    Database.executeQuery(sql).then((result) => {
+    
+//     res.status(202).json({ status:202,data:result.rows, message: "Deleted user successful" });
+    
+    
+
+//   }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
+// };
+//       }
+// })
+
+//   };
   
 
   //@Create or send an ​email​ to a ​group 
