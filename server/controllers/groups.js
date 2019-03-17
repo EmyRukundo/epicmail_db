@@ -435,88 +435,136 @@ const groupMember = (req, res) => {
   }).catch(error => res.status(500).json({ status: 500, error: ` error ${error}` }));
   }
 
-
-
-// const deleteMember = (req, res) => {
-
-//   let token = 0;
-//     let decodedToken = '';
-//     let userId = '';
-//     if (req.headers.authorization) {
-//       token = req.headers.authorization.split(' ')[1];
-//       decodedToken = jsonWebToken.verify(token, 'secret');
-//       userId = decodedToken.user[0].id;
-//     } else {
-//       return res.status(403).json({
-//         status: 403,
-//         error:" Oops,you are not authorised to delete any group!!",
-//       });
-//     }
-//     const checkGroupSql = `SELECT * FROM group_table WHERE ownerid='${userId}'`;
-//     const isAvailable = Database.executeQuery(checkGroupSql);
-//     isAvailable.then((isValid) => {
-//       if (isValid.rows) {
-//         if (isValid.rows.length) {
-//           const groupid = req.params.groupid;
-    
-          
-//   const sql = `DELETE FROM members_table WHERE groupid = '${groupid}' and userid ='${req.params.id}' RETURNING *`;
-//    Database.executeQuery(sql).then((result) => {
-    
-//     res.status(202).json({ status:202,data:result.rows, message: "Deleted user successful" });
-    
-    
-
-//   }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
-// };
-//       }
-// })
-
-//   };
-  
-
   //@Create or send an ​email​ to a ​group 
 
-  const emailGroup = (req, res) => {
-    joi.validate(req.body, Validation.emailgroupSchema, Validation.validationOption, async (err, result) => {
-      // if (err) {
-      //   return res.json({
-      //     status: 400,
-      //     error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
-      //   });
-      // }
-      // const dayMonthYear = result.happeningOn.split('/');
-      // const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
-      const newEmail = [
-        new Date(),
-        result.subject,
-        result.message,
-        result.parentMessageId,
-        result.status
-      ];
-      const sql = 'INSERT INTO emailgroup_table (created_on,subject,message,parentMessageId,status) VALUES ($1,$2,$3,$4,$5) RETURNING *';
-      const emailSql =Database.executeQuery(sql, newEmail);
-      emailSql.then((insertedEmail) => {
-        if (insertedEmail.rows.length) {
-          return res.status(200).json({
-            status: 200,
-            data: insertedEmail.rows,
-          });
-        }
+  // const emailGroup = (req, res) => {
+    
+
+  //     joi.validate(req.body, Validation.emailgroupSchema, Validation.validationOption, async (err, result) => {
+  //       if (err) {
+  //         return res.json({
+  //           status: 400,
+  //           error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
+  //         });
+  //       }
   
-        return res.status(400).json({
-          status: 400,
-          error: " Cant not send Email to the group",
-        });
+  //       let token = 0;
+  //     let decodedToken = '';
+  //     let userId = '';
+  //     if (req.headers.authorization) {
+  //       token = req.headers.authorization.split(' ')[1];
+  //       decodedToken = jsonWebToken.verify(token, 'secret');
+  //       userId = decodedToken.user[0].id;
+  //     } else {
+  //       return res.status(403).json({
+  //         status: 403,
+  //         error:"you are not authorised to send an email to the group",
+  //       });
+  //     }
+  
+  //       const newEmail = [
+  //       new Date(),
+  //       result.subject,
+  //       result.message,
+  //       result.parentMessageId,
+  //       result.status,
+  //       req.params.id
+  //     ];
+  //     const sql = 'INSERT INTO emailgroup_table (created_on,subject,message,parentMessageId,status,groupid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *';
+  //     const emailSql =Database.executeQuery(sql, newEmail);    
+  //       emailSql.then((emailResult) => {
+  //         if (emailResult.rows.length!==0) {
+  //           return res.status(201).json({
+  //             status: 201,
+  //             data: emailResult.rows,
+  //           });
+  //         }
+  //         return res.status(400).json({
+  //           status: 400,
+  //           error: 'Email could not be sent',
+  //         });
+  //       }).catch(error => res.status(500).json({
+  //         status: 500,
+  //         error: `Internal server error ${error}`,
+  //       }));
+  //     }).catch((error) => {
+  //       res.status(500).json({
+  //         status: 500,
+  //         error: `Internal server error ${error}`,
+  //       });
+  //     });
+    
+  // };
+//@@ send email to the group
+
+  const emailGroup = (req, res) => {
+
+    let token = 0;
+    let decodedToken = '';
+    let userId = '';
+    if (req.headers.authorization) {
+      token = req.headers.authorization.split(' ')[1];
+      decodedToken = jsonWebToken.verify(token, 'secret');
+      userId = decodedToken.user[0].id;
+    } else {
+      return res.status(403).json({
+        status: 403,
+        error:"Sorry,you can not send an email to the group",
       });
-    }).catch((error) => {
-      res.status(500).json({
-        status: 500,
-        // error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
-        error:"nonono"
-      });
-    });
+    }
+    const checkGroupSql = `SELECT * FROM group_table WHERE id='${req.params.id}'`;
+    const isAvailable = Database.executeQuery(checkGroupSql);
+    isAvailable.then((isValid) => {
+      if (isValid.rows) {
+        if (isValid.rows.length) {
+          joi.validate(req.body, Validation.emailgroupSchema, Validation.validationOption, async (err, result) => {
+            if (err) {
+              return res.json({
+                status: 400,
+                error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
+              });
+            }    
+            const newEmail = [
+              new Date(),
+              result.subject,
+              result.message,
+              result.parentMessageId,
+              result.status,
+              req.params.id
+            ];
+            const sql = 'INSERT INTO emailgroup_table (created_on,subject,message,parentMessageId,status,groupid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *';
+            const emailSql =Database.executeQuery(sql, newEmail); 
+              emailSql.then((sendEmailResult) => {
+
+                if (sendEmailResult.rows) {
+                     
+                  if (sendEmailResult.rows) {
+                    console.log(sendEmailResult.rows);
+                    return res.status(201).json({
+                      status: 201,
+                      data: sendEmailResult.rows,
+                    });
+                  }
+                }
+                return res.status(400).json({
+                  status: 400,
+                  error: 'You are not part of this group ',
+                });
+              }).catch(error => res.status(500).json({
+                status: 500,
+                error: `Internal server error ${error}`,
+              }));
+            }).catch(err => res.status(500).json({
+               status: 500, 
+               error:`Internal server error ${error}`,
+              }));
+        }
+      }
+    })
   };
+
+
+
 
     export{
         getGroups,createGroup,updateGroup,deleteGroup,groupMember,specificGroup,deleteMember,emailGroup
