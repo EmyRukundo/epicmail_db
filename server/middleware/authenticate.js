@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import getToken from '../helpers/functions';
 
 dotenv.config();
+
 const verifyToken = (req, res, next) => {
   // check if the token is not null
   if (getToken(req)) {
@@ -24,3 +25,4 @@ const verifyToken = (req, res, next) => {
     });
   }
 };
+export default verifyToken;

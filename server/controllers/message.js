@@ -3,17 +3,35 @@ import jsonWebToken from 'jsonwebtoken';
 import Database from '../db/db-connection';
 import Validation from '../helpers/validations';
 import messages from'../models/message.js';
-import Helper from '../helpers/helpers';
+import uuid from 'uuid';
 
-//@get all messages
-const getMessages = async (req, res) => res.json({
-    status: 200,
-    data:await messages(),
+//@@get all messages
+
+const getMessages = async (req, res) => {
+ 
+res.status(200).json({    
+          status: 200,
+          data:await messages(),
   });
+}
 
+  //@@Create message
 
-  //@Create message
+  
   const createMessage = (req, res) => {
+    let token = 0;
+    let decodedToken = '';
+    let userId = '';
+    if (req.headers.authorization) {
+      token = req.headers.authorization.split(' ')[1];
+      decodedToken = jsonWebToken.verify(token, 'secret');
+      userId = decodedToken.user[0].id;
+    } else {
+      return res.status(403).json({
+        status: 403,
+        error:" Oops,you are not authorised!!",
+      });
+    }
     joi.validate(req.body, Validation.messageSchema, Validation.validationOption, async (err, result) => {
       if (err) {
         return res.json({
@@ -21,24 +39,21 @@ const getMessages = async (req, res) => res.json({
           error: err.details[0].message.replace(/[$\/\\#,+()$~%.'":*<>{}]/g,''),
         });
       }
-      // let userId = '';
-      // console.log(result);
-    //   const dayMonthYear = result.happeningOn.split('/');
-    //   const date = new Date(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
       const newMessage = [
         new Date(),
         result.subject,
         result.messages,
-        result.senderid, //senderId
+        userId, //senderId
         result.receiverid, //receiverid
-        result.parentmessageid,
+        uuid(),
         result.status
-
       ];
-      const sql = 'INSERT INTO messages_table (created_on,subject,messages,senderid,receiverid,parentmessageid,status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *';
+      const sql = `INSERT INTO messages_table(created_on,subject,messages,senderid,receiverid,parentmessageid,status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`;
       
       const messageSql = Database.executeQuery(sql, newMessage);
-      messageSql.then((insertedMessage) => {    
+      console.log(messageSql.rows);
+      messageSql.then((insertedMessage) => {   
+      
         if (insertedMessage.rows) {
           return res.status(200).json(
               {    
@@ -61,12 +76,11 @@ const getMessages = async (req, res) => res.json({
     });
   };
   
-
-
 //@get a specific Email
 
   const specificEmail = (req, res) => {
 
+  
     const sql = `SELECT * FROM messages_table WHERE id = '${req.params.id}'`;
 
     const messageSql = Database.executeQuery(sql);
@@ -84,7 +98,7 @@ const getMessages = async (req, res) => res.json({
       return res.status(404).json({
 
         status: 404,
-        error: 'No email found! id does not exist ',
+        error: 'No email found on given id ',
 
       });
     }).catch(error => res.status(500).json({
@@ -99,12 +113,25 @@ const getMessages = async (req, res) => res.json({
   //@get a sent message
     
     const sentMessage = (req, res) => {
-        const sql = 'SELECT * FROM messages_table WHERE status = "sent" ';
-        
+          
+      let token = 0;
+      let decodedToken = '';
+      let userId = '';
+      if (req.headers.authorization) {
+        token = req.headers.authorization.split(' ')[1];
+        decodedToken = jsonWebToken.verify(token, 'secret');
+        userId = decodedToken.user[0].id;
+      } else {
+        return res.status(403).json({
+          status: 403,
+          error:" Oops,you are not authorised!!",
+        });
+      } 
+        const sql = "SELECT * FROM messages_table WHERE status =$1"; 
         const messageSql = Database.executeQuery(sql);
-
+        console.log(messageSql.rows);
         messageSql.then((result) => {
-    
+          console.log(result.rows);
           if (result.rows.length) {
 
             return res.status(200).json({
@@ -127,6 +154,20 @@ const getMessages = async (req, res) => res.json({
 // @get unread Message
 
 const unreadMessage = (req, res) => {
+
+  let token = 0;
+  let decodedToken = '';
+  let userId = '';
+  if (req.headers.authorization) {
+    token = req.headers.authorization.split(' ')[1];
+    decodedToken = jsonWebToken.verify(token, 'secret');
+    userId = decodedToken.user[0].id;
+  } else {
+    return res.status(403).json({
+      status: 403,
+      error:" Oops,you are not authorised!!",
+    });
+  }
 
     const sql =" SELECT * FROM messages_table WHERE status LIKE 's%' ";
     const messageSql = Database.executeQuery(sql);
@@ -156,6 +197,19 @@ const unreadMessage = (req, res) => {
  //@deleteEmail
   
  const deleteEmail = async (req, res) => {
+  let token = 0;
+  let decodedToken = '';
+  let userId = '';
+  if (req.headers.authorization) {
+    token = req.headers.authorization.split(' ')[1];
+    decodedToken = jsonWebToken.verify(token, 'secret');
+    userId = decodedToken.user[0].id;
+  } else {
+    return res.status(403).json({
+      status: 403,
+      error:" Oops,you are not authorised!!",
+    });
+  }
 
   const sql = `DELETE FROM messages_table WHERE id = '${req.params.id}' RETURNING *`;
 
@@ -167,12 +221,6 @@ const unreadMessage = (req, res) => {
 
   }).catch(error => res.status(500).json({ status: 500, error: `Server error ${error}` }));
 };
-
-
-
-
-
-
 
 
 // const deleteEmail = (req, res) => {

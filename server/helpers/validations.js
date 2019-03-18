@@ -12,12 +12,9 @@ const Validator = {
   messageSchema: joi.object().keys({
     subject: joi.string().required(),
     messages: joi.string().required(),
-    senderid: joi.string().required(),
     receiverid: joi.string().required(),
     parentmessageid: joi.number().integer().required(),
     status: joi.string().required(),
-    // parent_message_id: joi.string().required(),
-    // ​status: joi.string().required()
   }),
 
   groupSchema: joi.object().keys({
