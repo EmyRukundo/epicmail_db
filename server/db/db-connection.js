@@ -1,17 +1,20 @@
 import dotenv from 'dotenv';
-import { Pool } from 'pg';
+import pg from 'pg';
 
 
 dotenv.config();
 
-class Database {
-  constructor() {
-    this.pool = new Pool({
-      user: 'epic_mail',
-      host: 'localhost',
-      database: 'epic_mail',
-      password: 'andela',
-      port: 5432 
+// class Database {
+//   constructor() {
+//     this.pool = new Pool({
+//       user: 'epic_mail',
+//       host: 'localhost',
+//       database: 'epic_mail',
+//       password: 'andela',
+//       port: 5432 
+//     });
+    const Pool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL,
     });
 
     this.connect = async () => this.pool.connect();
@@ -42,7 +45,7 @@ class Database {
         messages VARCHAR(128) NOT NULL,
         senderid INTEGER NOT NULL,
         receiverid INTEGER NOT NULL,
-        parentmessageid INTEGER NOT NULL,
+        parentMessageId UUID NOT NULL,
         status VARCHAR(30) NOT NULL
     );  
     `;

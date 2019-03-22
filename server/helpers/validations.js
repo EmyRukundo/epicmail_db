@@ -12,8 +12,7 @@ const Validator = {
   messageSchema: joi.object().keys({
     subject: joi.string().required(),
     messages: joi.string().required(),
-    receiverid: joi.string().required(),
-    parentmessageid: joi.number().integer().required(),
+    receiverid: joi.number().integer().required(),
     status: joi.string().required(),
   }),
 
@@ -32,14 +31,13 @@ const Validator = {
   }),
   
   groupMemberSchema: joi.object().keys({
-    userid: joi.string().required(),
+    userid: joi.number().integer().required(),
     userole: joi.string().required(),
     
   }),
   emailgroupSchema: joi.object().keys({
     subject: joi.string().required(),
-    message: joi.string().required(),
-    parentMessageId: joi.number().integer().required(),
+    message: joi.string().required(), 
     status: joi.string().required(),
   }),
   validationOption: {
